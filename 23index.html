@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>All-In-One Productivity Tool</title>
+    <style>
+        /* CSS STYLE QISMI */
+        :root {
+            --primary: #6366f1;
+            --secondary: #4f46e5;
+            --dark: #1f2937;
+            --light: #f3f4f6;
+            --white: #ffffff;
+            --danger: #ef4444;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+
+        body {
+            background-color: #0f172a;
+            color: var(--white);
+            padding: 20px;
+        }
+
+        .dashboard {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 25px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .card {
+            background: #1e293b;
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            border: 1px solid #334155;
+        }
+
+        h2 { margin-bottom: 20px; font-size: 1.5rem; color: var(--primary); display: flex; align-items: center; gap: 10px; }
+
+        /* Kalkulyator dizayni */
+        .calc-screen {
+            background: #0f172a;
+            padding: 15px;
+            text-align: right;
+            font-size: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            height: 60px;
+            overflow: hidden;
+        }
+
+        .calc-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 15px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.2s;
+        }
+
+        .btn-num { background: #334155; color: white; }
+        .btn-op { background: var(--primary); color: white; }
+        .btn-eq { background: #10b981; color: white; grid-column: span 2; }
+        .btn-clr { background: var(--danger); color: white; }
+        button:hover { opacity: 0.8; transform: scale(0.98); }
+
+        /* Unit Converter dizayni */
+        .converter-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        select, input[type="number"], textarea, input[type="text"] {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #475569;
+            background: #0f172a;
+            color: white;
+            font-size: 1rem;
+        }
+
+        /* Note Taker dizayni */
+        .notes-list {
+            margin-top: 15px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+
+        .note-item {
+            background: #334155;
+            padding: 10px;
+            border-radius: 8px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .delete-note { background: none; color: var(--danger); padding: 5px; }
+
+        @media (max-width: 600px) { .dashboard { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+    <h1 style="text-align: center; margin-bottom: 40px;">🚀 Pro Dashboard</h1>
+
+    <div class="dashboard">
+        
+        <!-- 1. SMART CALCULATOR -->
+        <div class="card">
+            <h2>🔢 Kalkulyator</h2>
+            <div class="calc-screen" id="screen">0</div>
+            <div class="calc-buttons">
+                <button class="btn-clr" onclick="clearScreen()">C</button>
+                <button class="btn-op" onclick="press('/')">/</button>
+                <button class="btn-op" onclick="press('*')">×</button>
+                <button class="btn-op" onclick="backspace()">⌫</button>
+                
+                <button class="btn-num" onclick="press('7')">7</button>
+                <button class="btn-num" onclick="press('8')">8</button>
+                <button class="btn-num" onclick="press('9')">9</button>
+                <button class="btn-op" onclick="press('-')">-</button>
+                
+                <button class="btn-num" onclick="press('4')">4</button>
+                <button class="btn-num" onclick="press('5')">5</button>
+                <button class="btn-num" onclick="press('6')">6</button>
+                <button class="btn-op" onclick="press('+')">+</button>
+                
+                <button class="btn-num" onclick="press('1')">1</button>
+                <button class="btn-num" onclick="press('2')">2</button>
+                <button class="btn-num" onclick="press('3')">3</button>
+                <button class="btn-eq" onclick="calculate()">=</button>
+                
+                <button class="btn-num" style="grid-column: span 2;" onclick="press('0')">0</button>
+                <button class="btn-num" onclick="press('.')">.</button>
+            </div>
+        </div>
+
+        <!-- 2. UNIT CONVERTER -->
+        <div class="card">
+            <h2>⚖️ O'lchov Birliklari</h2>
+            <div class="converter-group">
+                <input type="number" id="unitInput" placeholder="Qiymatni kiriting" oninput="convert()">
+                <select id="unitType" onchange="convert()">
+                    <option value="km-m">Kilometrdan -> Metrga</option>
+                    <option value="kg-gr">Kilogrammdan -> Grammga</option>
+                    <option value="c-f">Selsiydan -> Farengeytga</option>
+                </select>
+                <div id="unitResult" style="font-size: 1.2rem; font-weight: bold; text-align: center; color: #10b981;">Natija: 0</div>
+            </div>
+        </div>
+
+        <!-- 3. QUICK NOTES -->
+        <div class="card">
+            <h2>📝 Tezkor Eslatmalar</h2>
+            <div class="converter-group">
+                <input type="text" id="noteInput" placeholder="Yangi eslatma...">
+                <button class="btn-op" onclick="addNote()">Saqlash</button>
+            </div>
+            <div class="notes-list" id="notesContainer"></div>
+        </div>
+
+    </div>
+
+    <script>
+        /* JAVASCRIPT QISMI */
+
+        // --- Kalkulyator Mantiqi ---
+        let screen = document.getElementById('screen');
+        function press(val) {
+            if(screen.innerText === '0') screen.innerText = val;
+            else screen.innerText += val;
+        }
+        function clearScreen() { screen.innerText = '0'; }
+        function backspace() {
+            if(screen.innerText.length > 1) screen.innerText = screen.innerText.slice(0, -1);
+            else screen.innerText = '0';
+        }
+        function calculate() {
+            try { screen.innerText = eval(screen.innerText); }
+            catch { screen.innerText = "Xato!"; setTimeout(clearScreen, 1500); }
+        }
+
+        // --- Converter Mantiqi ---
+        function convert() {
+            const val = parseFloat(document.getElementById('unitInput').value);
+            const type = document.getElementById('unitType').value;
+            const res = document.getElementById('unitResult');
+            
+            if(isNaN(val)) { res.innerText = "Qiymat kiriting"; return; }
+
+            let final;
+            switch(type) {
+                case 'km-m': final = val * 1000 + " m"; break;
+                case 'kg-gr': final = val * 1000 + " gr"; break;
+                case 'c-f': final = (val * 9/5) + 32 + " °F"; break;
+            }
+            res.innerText = "Natija: " + final;
+        }
+
+        // --- Eslatmalar Mantiqi ---
+        let notes = JSON.parse(localStorage.getItem('my_notes')) || [];
+
+        function renderNotes() {
+            const container = document.getElementById('notesContainer');
+            container.innerHTML = '';
+            notes.forEach((note, index) => {
+                container.innerHTML += `
+                    <div class="note-item">
+                        <span>${note}</span>
+                        <button class="delete-note" onclick="deleteNote(${index})">🗑️</button>
+                    </div>
+                `;
+            });
+        }
+
+        function addNote() {
+            const input = document.getElementById('noteInput');
+            if(input.value.trim() === '') return;
+            notes.push(input.value);
+            localStorage.setItem('my_notes', JSON.stringify(notes));
+            input.value = '';
+            renderNotes();
+        }
+
+        function deleteNote(index) {
+            notes.splice(index, 1);
+            localStorage.setItem('my_notes', JSON.stringify(notes));
+            renderNotes();
+        }
+
+        // Sahifa yuklanganda eslatmalarni chiqarish
+        renderNotes();
+    </script>
+</body>
+</html>
